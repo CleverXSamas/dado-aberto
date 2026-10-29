@@ -2,6 +2,8 @@
 
 Calculadora visual de probabilidades de dados para RPG. Monte a jogada em português — `3d6`, vantagem, melhores 3, explosões, sucessos — e veja a distribuição completa enquanto decide.
 
+**Site ao vivo:** [cleverxsamas.github.io/dado-aberto](https://cleverxsamas.github.io/dado-aberto/)
+
 Inspirada na ideia do [AnyDice](https://anydice.com/), mas sem exigir uma linguagem de programação. É uma página estática, sem build, sem dependências e sem envio de dados para servidor.
 
 ## Como abrir
