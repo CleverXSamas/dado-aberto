@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dado Aberto é uma calculadora visual de probabilidades de dados para RPG. Monte rolagens como 4d6 melhores 3, vantagem, explosões e sucessos — e veja as chances na hora.">
+  <meta name="theme-color" content="#f4efe5">
+  <title>Dado Aberto — Probabilidades de dados para RPG</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2316241f'/%3E%3Cpath d='M16 4.8 26 10.6v10.8L16 27.2 6 21.4V10.6z' fill='none' stroke='%23f4efe5' stroke-width='1.6'/%3E%3Cpath d='m16 10 5 3v5l-5 3-5-3v-5z' fill='none' stroke='%23d9552a' stroke-width='1.4'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("dado-aberto-theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = saved || (prefersDark ? "dark" : "light");
+      } catch (error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#builderTitle">Pular para a calculadora</a>
+
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-d20" viewBox="0 0 24 24">
+      <path d="M12 2.4 21.2 7.7v8.6L12 21.6 2.8 16.3V7.7z"/>
+      <path d="m12 6.8 5.2 3.1v5.2L12 18.2l-5.2-3.1V9.9z"/>
+      <path d="M12 2.4v4.4M21.2 7.7l-4 2.2M21.2 16.3l-4-2.2M12 21.6v-3.4M2.8 16.3l4-2.2M2.8 7.7l4 2.2"/>
+    </symbol>
+    <symbol id="icon-dice" viewBox="0 0 24 24">
+      <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="4"/>
+      <circle cx="8.2" cy="8.2" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="15.8" cy="8.2" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="8.2" cy="15.8" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="15.8" cy="15.8" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="icon-link" viewBox="0 0 24 24">
+      <path d="M10.6 13.4a4.2 4.2 0 0 0 6 0l2.1-2.1a4.24 4.24 0 0 0-6-6l-1.2 1.2"/>
+      <path d="M13.4 10.6a4.2 4.2 0 0 0-6 0l-2.1 2.1a4.24 4.24 0 0 0 6 6l1.2-1.2"/>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24">
+      <path d="M20 15.2A8.4 8.4 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/>
+    </symbol>
+    <symbol id="icon-sound-on" viewBox="0 0 24 24">
+      <path d="M4 9.4h3.2L12 5.4v13.2l-4.8-4H4z"/>
+      <path d="M15.4 8.8a4.5 4.5 0 0 1 0 6.4M18.2 6a8.2 8.2 0 0 1 0 12"/>
+    </symbol>
+    <symbol id="icon-sound-off" viewBox="0 0 24 24">
+      <path d="M4 9.4h3.2L12 5.4v13.2l-4.8-4H4z"/>
+      <path d="m16.2 9.2 4 5.6M20.2 9.2l-4 5.6"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="m5 12.5 4.2 4.2L19 7.2"/>
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14"/>
+    </symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24">
+      <path d="m7 9.5 5 5 5-5"/>
+    </symbol>
+    <symbol id="icon-swap" viewBox="0 0 24 24">
+      <path d="M4 8h14m-4-4 4 4-4 4M20 16H6m4 4-4-4 4-4"/>
+    </symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24">
+      <path d="M12 2.8c.5 5.1 2.7 7.3 7.8 7.8-5.1.5-7.3 2.7-7.8 7.8-.5-5.1-2.7-7.3-7.8-7.8 5.1-.5 7.3-2.7 7.8-7.8Z"/>
+      <path d="M18.6 16.2c.2 2 1 2.8 3 3-2 .2-2.8 1-3 3-.2-2-1-2.8-3-3 2-.2 2.8-1 3-3Z"/>
+    </symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24">
+      <rect x="8" y="8" width="12" height="12" rx="2.5"/>
+      <path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>
+    </symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14m-5-5 5 5-5 5"/>
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.2"/>
+      <circle cx="12" cy="12" r="3.6"/>
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="shell header-shell">
+      <a class="brand" href="#calcWorkspace" data-view-link="calc">
+        <span class="brand-mark">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 4.8 40 13.6v18.8L24 41.2 8 32.4V13.6z" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="m24 13.2 9 5.4v9l-9 5.4-9-5.4v-9z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M24 4.8v8.4M40 13.6l-7 5M40 32.4l-7-5M24 41.2v-8.2M8 32.4l7-5M8 13.6l7 5" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/>
+          </svg>
+        </span>
+        <span class="brand-word">
+          <strong>Dado Aberto</strong>
+          <small>probabilidades de mesa</small>
+        </span>
+      </a>
+
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-link is-active" type="button" data-view-link="calc" aria-current="page">Calculadora</button>
+        <button class="nav-link" type="button" data-view-link="duel">Duelo</button>
+        <a class="nav-link nav-anchor" href="#guia">Guia</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Alternar tema claro e escuro" title="Alternar tema">
+          <svg class="icon icon-sun"><use href="#icon-sun"></use></svg>
+          <svg class="icon icon-moon"><use href="#icon-moon"></use></svg>
+        </button>
+        <button class="button button-ghost share-button" id="shareButton" type="button">
+          <svg class="icon"><use href="#icon-link"></use></svg>
+          <span>Copiar link</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Feito para a mesa, não para a planilha</p>
+          <h1>Antes de rolar,<br><em>saiba a chance.</em></h1>
+          <p class="hero-lede">Monte a jogada em português — <strong>3d6</strong>, vantagem, melhores 3, explosões — e veja a distribuição completa enquanto decide.</p>
+          <div class="hero-points" aria-label="Diferenciais">
+            <span><svg class="icon"><use href="#icon-check"></use></svg>Sem programar</span>
+            <span><svg class="icon"><use href="#icon-check"></use></svg>Cálculo exato</span>
+            <span><svg class="icon"><use href="#icon-check"></use></svg>Roda no seu navegador</span>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-glow"></div>
+          <svg class="hero-die" viewBox="0 0 440 400">
+            <defs>
+              <linearGradient id="dieFace" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="var(--art-face-a)"/>
+                <stop offset="100%" stop-color="var(--art-face-b)"/>
+              </linearGradient>
+              <filter id="dieShadow" x="-30%" y="-30%" width="160%" height="170%">
+                <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#16241f" flood-opacity=".18"/>
+              </filter>
+            </defs>
+            <circle cx="220" cy="200" r="158" class="art-orbit"/>
+            <circle cx="220" cy="200" r="128" class="art-orbit art-orbit-dashed"/>
+            <g class="die-body" filter="url(#dieShadow)">
+              <polygon points="220,44 366,128 366,272 220,356 74,272 74,128" class="die-shell"/>
+              <polygon points="220,96 300,166 220,236 140,166" fill="url(#dieFace)" class="die-center"/>
+              <path d="M220 44 74 128l66 38 80-70Z" class="die-facet facet-a"/>
+              <path d="M220 44l146 84-66 38-80-70Z" class="die-facet facet-b"/>
+              <path d="M366 128v144l-66-38V166Z" class="die-facet facet-c"/>
+              <path d="M366 272l-146 84v-50l80-70Z" class="die-facet facet-b"/>
+              <path d="M220 356 74 272l66-38 80 70Z" class="die-facet facet-c"/>
+              <path d="M74 272V128l66 38v68Z" class="die-facet facet-a"/>
+              <path d="M220 44v52M366 128l-66 38M366 272l-66-38M220 356v-50M74 272l66-38M74 128l66 38" class="die-edges"/>
+              <text x="220" y="183" class="die-number">20</text>
+            </g>
+            <g class="art-spark art-spark-1">
+              <path d="M365 78c.4 4.4 2.3 6.3 6.7 6.7-4.4.4-6.3 2.3-6.7 6.7-.4-4.4-2.3-6.3-6.7-6.7 4.4-.4 6.3-2.3 6.7-6.7Z"/>
+            </g>
+            <g class="art-spark art-spark-2">
+              <path d="M90 300c.3 3.2 1.7 4.6 4.9 4.9-3.2.3-4.6 1.7-4.9 4.9-.3-3.2-1.7-4.6-4.9-4.9 3.2-.3 4.6-1.7 4.9-4.9Z"/>
+            </g>
+          </svg>
+          <div class="art-chip chip-formula">
+            <span class="chip-label">vantagem</span>
+            <code>2d20<small>melhor</small></code>
+          </div>
+          <div class="art-chip chip-chance">
+            <strong>91%</strong>
+            <span>de chance</span>
+          </div>
+          <div class="art-chip chip-bonus">+5</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="calc-view" id="calcView">
+      <section class="presets shell" aria-labelledby="presetsTitle">
+        <div class="section-inline-head">
+          <div>
+            <p class="step-label">Atalhos de mesa</p>
+            <h2 id="presetsTitle">Comece por uma jogada comum</h2>
+          </div>
+          <span class="section-note">ou monte a sua ao lado</span>
+        </div>
+        <div class="preset-row" id="presetList" aria-label="Rolagens prontas"></div>
+      </section>
+
+    <div class="shell workspace-shell">
+      <section class="workspace-grid" id="calcWorkspace" aria-label="Calculadora de probabilidades">
+        <aside class="panel builder" aria-labelledby="builderTitle">
+          <div class="panel-head builder-head">
+            <div>
+              <p class="step-label">Passo 1 · A jogada</p>
+              <h2 id="builderTitle">Monte sua rolagem</h2>
+            </div>
+            <button class="text-button" id="resetButton" type="button">Limpar</button>
+          </div>
+
+          <div class="mode-tabs" role="tablist" aria-label="Tipo de rolagem">
+            <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="sum">Somar dados</button>
+            <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="success">Contar sucessos</button>
+          </div>
+
+          <div class="formula-preview" title="Notação usada por calculadoras como o AnyDice">
+            <span class="formula-label">Notação</span>
+            <code id="formulaText">d20 + 5</code>
+            <button class="icon-subtle" id="copyFormula" type="button" aria-label="Copiar notação" title="Copiar notação">
+              <svg class="icon"><use href="#icon-copy"></use></svg>
+            </button>
+          </div>
+
+          <section class="builder-section" aria-labelledby="diceLabel">
+            <div class="section-label-row">
+              <label id="diceLabel">Dados principais</label>
+              <span class="tiny-help" id="diceLimitHint">1 a 20 dados</span>
+            </div>
+            <div class="dice-builder">
+              <div class="stepper stepper-qty">
+                <button type="button" data-step="-1" data-target="primaryCount" aria-label="Menos um dado (−)">−</button>
+                <input id="primaryCount" type="number" min="1" max="20" value="1" inputmode="numeric" aria-label="Quantidade de dados">
+                <button type="button" data-step="1" data-target="primaryCount" aria-label="Mais um dado (+)">+</button>
+              </div>
+              <div class="die-picker" id="diePicker" role="group" aria-label="Tipo de dado"></div>
+            </div>
+          </section>
+
+          <section class="builder-section" id="sumRules" aria-label="Regras dos dados">
+            <div class="rule-line">
+              <label>Manter</label>
+              <div class="compact-segmented" id="keepMode" role="group" aria-label="Quais dados manter">
+                <button class="is-active" type="button" data-keep="all" aria-pressed="true">Todos</button>
+                <button type="button" data-keep="high" aria-pressed="false">Maiores</button>
+                <button type="button" data-keep="low" aria-pressed="false">Menores</button>
+              </div>
+            </div>
+            <div class="keep-detail" id="keepDetail" hidden>
+              <span>Manter os</span>
+              <div class="mini-stepper">
+                <button type="button" data-step="-1" data-target="keepCount" aria-label="Manter menos dados (−)">−</button>
+                <input id="keepCount" type="number" min="1" max="20" value="3" inputmode="numeric" aria-label="Quantidade de dados mantidos">
+                <button type="button" data-step="1" data-target="keepCount" aria-label="Manter mais dados (+)">+</button>
+              </div>
+              <span id="keepDetailLabel">maiores</span>
+            </div>
+          </section>
+
+          <section class="builder-section" id="explodeSection" aria-label="Explosões">
+            <label class="toggle-row" for="explodeToggle">
+              <span class="toggle-copy">
+                <span class="toggle-title">Dados explosivos <span class="tag">opcional</span></span>
+                <span class="toggle-hint" id="explodeHint">Ao tirar o valor máximo, role de novo e some.</span>
+              </span>
+              <span class="switch">
+                <input id="explodeToggle" type="checkbox">
+                <span class="switch-track" aria-hidden="true"></span>
+              </span>
+            </label>
+          </section>
+
+          <section class="builder-section" id="successRules" aria-label="Regras de sucesso" hidden>
+            <div class="rule-line">
+              <label for="successTarget">Sucesso a partir de</label>
+              <div class="mini-stepper">
+                <button type="button" data-step="-1" data-target="successTarget" aria-label="Diminuir o alvo por dado (−)">−</button>
+                <input id="successTarget" type="number" min="1" max="100" value="8" inputmode="numeric" aria-label="Valor mínimo para um sucesso">
+                <button type="button" data-step="1" data-target="successTarget" aria-label="Aumentar o alvo por dado (+)">+</button>
+              </div>
+            </div>
+            <p class="tiny-help">Cada dado que alcançar esse valor conta 1 sucesso. Explosões continuam contando.</p>
+          </section>
+
+          <section class="builder-section" aria-labelledby="bonusLabel">
+            <div class="rule-line">
+              <label id="bonusLabel" for="bonusInput">Bônus <span class="label-hint" id="bonusHint">somado ao total</span></label>
+              <div class="stepper stepper-bonus">
+                <button type="button" data-step="-1" data-target="bonus" aria-label="Diminuir o bônus (−)">−</button>
+                <input id="bonusInput" type="number" min="-50" max="50" value="5" inputmode="numeric" aria-label="Bônus numérico">
+                <button type="button" data-step="1" data-target="bonus" aria-label="Aumentar o bônus (+)">+</button>
+              </div>
+            </div>
+
+            <div class="extras-block">
+              <div class="section-label-row">
+                <span id="extrasLabel">Dados extras <span class="tag">opcional</span></span>
+                <button class="text-button text-button-small" id="addExtra" type="button">
+                  <svg class="icon"><use href="#icon-plus"></use></svg>Adicionar
+                </button>
+              </div>
+              <div class="extra-list" id="extraList"></div>
+              <p class="tiny-help" id="extrasHelp">Somados ao resultado principal. Use para dano misto.</p>
+            </div>
+          </section>
+
+          <div class="roll-summary">
+            <span class="summary-label">Em palavras</span>
+            <p id="rollSummary">Role 1d20 e some 5.</p>
+          </div>
+
+          <button class="button button-primary roll-button" id="rollButton" type="button">
+            <svg class="icon"><use href="#icon-dice"></use></svg>
+            <span id="rollButtonLabel">Rolar na mesa</span>
+          </button>
+          <div class="roll-foot">
+            <p class="roll-hint">Uma rolagem de verdade, só para conferir.</p>
+            <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" title="Desativar som da rolagem">
+              <svg class="icon icon-sound-on" aria-hidden="true"><use href="#icon-sound-on"></use></svg>
+              <svg class="icon icon-sound-off" aria-hidden="true"><use href="#icon-sound-off"></use></svg>
+              <span id="soundToggleLabel">Som ligado</span>
+            </button>
+          </div>
+          <div class="roll-result" id="rollResult" hidden aria-live="polite"></div>
+        </aside>
+
+        <section class="panel results" aria-labelledby="resultsTitle">
+          <div class="panel-head results-head">
+            <div>
+              <p class="step-label">Passo 2 · As chances</p>
+              <h2 id="resultsTitle">O que esperar</h2>
+            </div>
+            <div class="target-box">
+              <label for="dcInput" id="dcLabel">Seu alvo</label>
+              <div class="mini-stepper stepper-target">
+                <button type="button" data-step="-1" data-target="dc" aria-label="Diminuir o alvo (−)">−</button>
+                <input id="dcInput" type="number" min="-50" max="1000" value="15" inputmode="numeric" aria-label="Alvo da rolagem">
+                <button type="button" data-step="1" data-target="dc" aria-label="Aumentar o alvo (+)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="probability-hero">
+            <div class="hero-prob-main">
+              <span class="hero-prob-number" id="probabilityValue">55,0%</span>
+              <p id="probabilitySentence">de alcançar <strong>15</strong> ou mais</p>
+            </div>
+            <div class="hero-prob-side">
+              <span class="odds-pill" id="oddsPill">≈ 1 em 2</span>
+              <span class="hero-prob-detail" id="probabilityDetail">45% ficam abaixo do alvo</span>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <div>
+                <h3>Distribuição dos resultados</h3>
+                <p id="chartHint">Clique numa coluna para mirar no valor.</p>
+              </div>
+              <div class="segmented" id="chartMode" role="group" aria-label="Modo do gráfico">
+                <button class="is-active" type="button" data-chart="exact" aria-pressed="true">Exata</button>
+                <button type="button" data-chart="atleast" aria-pressed="false">Pelo menos</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <svg class="chart" id="chart" tabindex="0" role="group" aria-label="Distribuição de probabilidades" aria-describedby="chartHint chartNote"></svg>
+              <div class="chart-tooltip" id="chartTooltip" hidden></div>
+            </div>
+            <div class="chart-foot">
+              <span class="legend" id="chartLegend">
+                <span class="legend-item"><i class="legend-swatch"></i>Abaixo do alvo</span>
+                <span class="legend-item"><i class="legend-swatch accent"></i>No alvo ou acima</span>
+              </span>
+              <span class="chart-note" id="chartNote"></span>
+            </div>
+            <p class="sr-only" id="chartA11y" aria-live="polite"></p>
+          </div>
+
+          <div class="stat-grid" aria-label="Estatísticas da distribuição">
+            <div class="stat">
+              <span class="stat-label">Média</span>
+              <strong id="statMean">15,5</strong>
+              <span class="stat-sub" id="statMeanSub">centro da distribuição</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Mais provável</span>
+              <strong id="statMode">20</strong>
+              <span class="stat-sub" id="statModeSub">o pico de chance</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Metade central</span>
+              <strong id="statRange">11–20</strong>
+              <span class="stat-sub" id="statRangeSub">50% das rolagens</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Desvio padrão</span>
+              <strong id="statSd">2,9</strong>
+              <span class="stat-sub" id="statSdSub">quanto os resultados abrem</span>
+            </div>
+          </div>
+
+          <div class="explain-card">
+            <div class="explain-mark" aria-hidden="true">
+              <svg class="icon"><use href="#icon-spark"></use></svg>
+            </div>
+            <div class="explain-body">
+              <div class="explain-head">
+                <h3>Em palavras simples</h3>
+                <button class="text-button text-button-small" id="tableToggle" type="button" aria-expanded="false" aria-controls="tablePanel">
+                  Ver tabela completa
+                  <svg class="icon chevron"><use href="#icon-chevron"></use></svg>
+                </button>
+              </div>
+              <p id="plainExplanation">Role 1d20 e some 5. O total fica entre 6 e 25, com média 15,5. Para alcançar 15 ou mais, a chance é 55%.</p>
+            </div>
+          </div>
+
+          <div class="table-panel" id="tablePanel" hidden>
+            <div class="table-head">
+              <span>Resultado a resultado</span>
+              <span id="tableCount">21 resultados</span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <caption class="sr-only">Distribuição exata por resultado</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" id="tableValueHead">Resultado</th>
+                    <th scope="col">Chance exata</th>
+                    <th scope="col">Pelo menos</th>
+                  </tr>
+                </thead>
+                <tbody id="distributionTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+    </div>
+
+    <section class="view duel-view" id="duelView" hidden aria-labelledby="duelTitle">
+      <div class="shell">
+        <div class="duel-heading">
+          <p class="step-label">Modo duelo · rolagens opostas</p>
+          <h1 id="duelTitle">Quem leva a melhor?</h1>
+          <p>Compare duas rolagens independentes. O cálculo considera todos os resultados possíveis — não só a média.</p>
+        </div>
+
+        <div class="duel-builders">
+          <article class="panel duel-builder side-a" aria-labelledby="sideATitle">
+            <div class="duel-builder-head">
+              <span class="side-badge">A</span>
+              <div>
+                <h2 id="sideATitle">Lado A</h2>
+                <p>Seu personagem, o atacante, quem chegou primeiro.</p>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="countA">Dados</label>
+              <div class="duel-controls">
+                <div class="mini-stepper">
+                  <button type="button" data-duel-step="-1" data-field="countA" aria-label="Menos um dado para o lado A (−)">−</button>
+                  <input id="countA" type="number" min="1" max="12" value="1" inputmode="numeric" aria-label="Quantidade de dados do lado A">
+                  <button type="button" data-duel-step="1" data-field="countA" aria-label="Mais um dado para o lado A (+)">+</button>
+                </div>
+                <select id="dieA" class="select" aria-label="Tipo de dado do lado A"></select>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="keepA">Manter</label>
+              <div class="duel-controls">
+                <select id="keepA" class="select">
+                  <option value="all">Todos os dados</option>
+                  <option value="high">Os maiores</option>
+                  <option value="low">Os menores</option>
+                </select>
+                <div class="mini-stepper" id="keepAControl" hidden>
+                  <button type="button" data-duel-step="-1" data-field="keepCountA" aria-label="Manter menos dados no lado A (−)">−</button>
+                  <input id="keepCountA" type="number" min="1" max="12" value="1" inputmode="numeric" aria-label="Dados mantidos no lado A">
+                  <button type="button" data-duel-step="1" data-field="keepCountA" aria-label="Manter mais dados no lado A (+)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="bonusA">Bônus</label>
+              <div class="duel-controls">
+                <div class="mini-stepper">
+                  <button type="button" data-duel-step="-1" data-field="bonusA" aria-label="Diminuir o bônus do lado A (−)">−</button>
+                  <input id="bonusA" type="number" min="-30" max="30" value="5" inputmode="numeric" aria-label="Bônus do lado A">
+                  <button type="button" data-duel-step="1" data-field="bonusA" aria-label="Aumentar o bônus do lado A (+)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="duel-side-summary">
+              <code id="duelFormulaA">1d20 + 5</code>
+              <span id="duelMetaA">média 15,5 · faixa 6–25</span>
+            </div>
+          </article>
+
+          <div class="duel-vs" aria-hidden="true"><span>VS</span></div>
+
+          <article class="panel duel-builder side-b" aria-labelledby="sideBTitle">
+            <div class="duel-builder-head">
+              <span class="side-badge">B</span>
+              <div>
+                <h2 id="sideBTitle">Lado B</h2>
+                <p>O oponente, a defesa, quem chegou depois.</p>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="countB">Dados</label>
+              <div class="duel-controls">
+                <div class="mini-stepper">
+                  <button type="button" data-duel-step="-1" data-field="countB" aria-label="Menos um dado para o lado B (−)">−</button>
+                  <input id="countB" type="number" min="1" max="12" value="1" inputmode="numeric" aria-label="Quantidade de dados do lado B">
+                  <button type="button" data-duel-step="1" data-field="countB" aria-label="Mais um dado para o lado B (+)">+</button>
+                </div>
+                <select id="dieB" class="select" aria-label="Tipo de dado do lado B"></select>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="keepB">Manter</label>
+              <div class="duel-controls">
+                <select id="keepB" class="select">
+                  <option value="all">Todos os dados</option>
+                  <option value="high">Os maiores</option>
+                  <option value="low">Os menores</option>
+                </select>
+                <div class="mini-stepper" id="keepBControl" hidden>
+                  <button type="button" data-duel-step="-1" data-field="keepCountB" aria-label="Manter menos dados no lado B (−)">−</button>
+                  <input id="keepCountB" type="number" min="1" max="12" value="1" inputmode="numeric" aria-label="Dados mantidos no lado B">
+                  <button type="button" data-duel-step="1" data-field="keepCountB" aria-label="Manter mais dados no lado B (+)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="duel-row">
+              <label for="bonusB">Bônus</label>
+              <div class="duel-controls">
+                <div class="mini-stepper">
+                  <button type="button" data-duel-step="-1" data-field="bonusB" aria-label="Diminuir o bônus do lado B (−)">−</button>
+                  <input id="bonusB" type="number" min="-30" max="30" value="3" inputmode="numeric" aria-label="Bônus do lado B">
+                  <button type="button" data-duel-step="1" data-field="bonusB" aria-label="Aumentar o bônus do lado B (+)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="duel-side-summary">
+              <code id="duelFormulaB">1d20 + 3</code>
+              <span id="duelMetaB">média 13,5 · faixa 4–23</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="duel-actions">
+          <button class="text-button" id="swapDuel" type="button">
+            <svg class="icon"><use href="#icon-swap"></use></svg>Trocar lados
+          </button>
+          <span class="tiny-help">A e B são independentes.</span>
+        </div>
+
+        <section class="panel duel-results" aria-labelledby="duelResultTitle">
+          <div class="duel-verdict">
+            <p class="step-label">Resultado do confronto</p>
+            <h2 id="duelResultTitle"><span id="duelWinner">A</span> vence <span id="duelWinRate">57,3%</span> das vezes.</h2>
+            <p id="duelVerdictDetail">O empate aparece em 4,5% dos casos.</p>
+            <div class="duel-split" id="duelSplit" role="img" aria-label="Divisão das chances entre A, empate e B">
+              <span class="split-a" id="duelBarA"></span>
+              <span class="split-tie" id="duelBarTie"></span>
+              <span class="split-b" id="duelBarB"></span>
+            </div>
+            <div class="duel-legend" aria-hidden="true">
+              <span class="legend-item"><i class="legend-swatch side-a-swatch"></i>A vence</span>
+              <span class="legend-item"><i class="legend-swatch tie-swatch"></i>Empate</span>
+              <span class="legend-item"><i class="legend-swatch side-b-swatch"></i>B vence</span>
+            </div>
+          </div>
+
+          <div class="duel-stat-grid">
+            <div class="stat">
+              <span class="stat-label">A vence</span>
+              <strong id="duelStatA">57,3%</strong>
+              <span class="stat-sub">resultado maior</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Empate</span>
+              <strong id="duelStatTie">4,5%</strong>
+              <span class="stat-sub">mesmo total</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">B vence</span>
+              <strong id="duelStatB">38,3%</strong>
+              <span class="stat-sub">resultado maior</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Margem média</span>
+              <strong id="duelStatMargin">+2,0</strong>
+              <span class="stat-sub">A menos B</span>
+            </div>
+          </div>
+
+          <div class="chart-card duel-chart-card">
+            <div class="chart-head">
+              <div>
+                <h3>Margem da disputa</h3>
+                <p>A − B. Zero significa empate.</p>
+              </div>
+              <span class="chart-note" id="duelChartNote"></span>
+            </div>
+            <div class="chart-wrap">
+              <svg class="chart" id="duelChart" tabindex="0" role="group" aria-label="Distribuição da margem entre os lados A e B" aria-describedby="duelChartNote duelExplain"></svg>
+              <div class="chart-tooltip" id="duelTooltip" hidden></div>
+            </div>
+            <p class="duel-explain" id="duelExplain"></p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="guide" id="guia" aria-labelledby="guideTitle">
+      <div class="shell">
+        <div class="guide-head">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot"></span>Guia rápido</p>
+            <h2 id="guideTitle">Três passos. Nenhuma fórmula.</h2>
+          </div>
+          <p>O gráfico não é um oráculo misterioso: ele soma as chances de cada combinação possível. Aqui está o suficiente para ler qualquer resultado.</p>
+        </div>
+
+        <div class="guide-steps">
+          <article class="guide-step">
+            <span class="step-number">01</span>
+            <h3>Monte a jogada</h3>
+            <p>Quantos dados, qual dado, o que fazer com eles. “4d6, melhores 3” e “2d20, melhor” viram botões — não código.</p>
+            <div class="step-visual">
+              <span class="mini-chip">4d6</span>
+              <span class="mini-chip accent">melhores 3</span>
+              <span class="mini-chip">+2</span>
+            </div>
+          </article>
+          <article class="guide-step">
+            <span class="step-number">02</span>
+            <h3>Escolha um alvo</h3>
+            <p>É a dificuldade que você precisa alcançar. Clique numa coluna do gráfico ou digite o número. A pergunta muda de “qual é a distribuição?” para “eu consigo?”.</p>
+            <div class="step-visual">
+              <span class="mini-chip target">alvo 15</span>
+              <span class="mini-arrow">→</span>
+              <span class="mini-chip accent">55%</span>
+            </div>
+          </article>
+          <article class="guide-step">
+            <span class="step-number">03</span>
+            <h3>Leia as chances</h3>
+            <p>“Exata” é a chance de cair exatamente naquele número. “Pelo menos” soma tudo à direita: é a chance de alcançar o alvo ou superá-lo.</p>
+            <div class="step-visual">
+              <span class="mini-chip">12 = 7,5%</span>
+              <span class="mini-chip accent">≥ 12 = 37,5%</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="guide-grid">
+          <article class="guide-card">
+            <h3>Notação, traduzida</h3>
+            <dl class="notation-list">
+              <div><dt><code>3d6</code></dt><dd>Três dados de seis lados, somados.</dd></div>
+              <div><dt><code>4d6kh3</code></dt><dd>Quatro d6; mantenha os 3 maiores.</dd></div>
+              <div><dt><code>2d20kl1</code></dt><dd>Dois d20; mantenha o menor (desvantagem).</dd></div>
+              <div><dt><code>+2</code></dt><dd>Some 2 ao total, depois de rolar.</dd></div>
+              <div><dt><code>explosão</code></dt><dd>Se cair o valor máximo, role de novo e some.</dd></div>
+              <div><dt><code>sucessos</code></dt><dd>Cada dado que alcança o alvo conta 1.</dd></div>
+            </dl>
+          </article>
+
+          <article class="guide-card">
+            <h3>Os números do painel</h3>
+            <dl class="notation-list">
+              <div><dt>Média</dt><dd>O centro de gravidade. Depois de muitas rolagens, a média se aproxima dele.</dd></div>
+              <div><dt>Mais provável</dt><dd>O pico do gráfico. Pode haver dois valores empatados.</dd></div>
+              <div><dt>Metade central</dt><dd>O intervalo onde caem 50% das rolagens — do quartil 25% ao 75%.</dd></div>
+              <div><dt>Desvio padrão</dt><dd>O quanto os resultados costumam se afastar da média. Menor = mais previsível.</dd></div>
+              <div><dt>Pelo menos</dt><dd>A soma das chances do alvo até o máximo. É a leitura certa para testes.</dd></div>
+            </dl>
+          </article>
+        </div>
+
+        <div class="faq">
+          <h3>Perguntas de mesa</h3>
+          <details>
+            <summary>Isso simula rolagens ou calcula de verdade?</summary>
+            <p>Calcula exatamente todas as combinações possíveis e soma as probabilidades. O botão “Rolar na mesa” é só uma amostra de verdade para conferir a intuição. Não há Monte Carlo no gráfico.</p>
+          </details>
+          <details>
+            <summary>Por que a média nem sempre é o resultado mais provável?</summary>
+            <p>Em 3d6, a média é 10,5 — um valor que nem existe no dado. Os resultados 10 e 11 empatam como mais prováveis. Já em dados explosivos, a cauda longa puxa a média para cima sem criar um pico nela.</p>
+          </details>
+          <details>
+            <summary>Como funcionam “manter os maiores” e explosões juntos?</summary>
+            <p>Cada dado é resolvido com suas explosões e então os maiores totais são mantidos. É útil para regras caseiras e sistemas que somam explosões antes de comparar os dados.</p>
+          </details>
+          <details>
+            <summary>E os resultados muito raros de uma explosão?</summary>
+            <p>A cauda é calculada até ficar menor que a precisão exibida (menos de 0,0000000001%). Ela não altera nenhuma porcentagem da tela, mas mantém a matemática honesta.</p>
+          </details>
+          <details>
+            <summary>Meus dados ou rolagens são enviados para algum lugar?</summary>
+            <p>Não. Tudo roda no seu navegador. O link compartilhado guarda apenas a configuração da jogada — nunca resultados ou dados pessoais.</p>
+          </details>
+        </div>
+
+        <div class="guide-cta">
+          <p>Pronto para decidir com números?</p>
+          <button class="button button-primary" type="button" data-view-link="calc">
+            Voltar para a calculadora
+            <svg class="icon"><use href="#icon-arrow"></use></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div class="footer-brand">
+        <a class="brand brand-small" href="#calcWorkspace" data-view-link="calc">
+          <span class="brand-mark">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M24 4.8 40 13.6v18.8L24 41.2 8 32.4V13.6z" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="m24 13.2 9 5.4v9l-9 5.4-9-5.4v-9z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </span>
+          <span class="brand-word"><strong>Dado Aberto</strong></span>
+        </a>
+        <p>Probabilidades para decidir com a mesa, não no escuro.</p>
+        <span class="footer-note">Cálculo exato · sem cadastro · funciona offline</span>
+      </div>
+      <div class="footer-links">
+        <h3>Atalhos</h3>
+        <button type="button" data-view-link="calc">Calculadora</button>
+        <button type="button" data-view-link="duel">Duelo</button>
+        <a href="#guia">Guia rápido</a>
+      </div>
+      <div class="footer-about">
+        <h3>Uma ferramenta aberta</h3>
+        <p>Inspirada na profundidade do <a href="https://anydice.com" target="_blank" rel="noopener noreferrer">AnyDice</a>, com uma construção visual para quem quer responder rápido na mesa.</p>
+        <p>Para D&amp;D, Tormenta, Ordem Paranormal, World of Darkness e qualquer sistema de dados.</p>
+      </div>
+    </div>
+    <div class="shell footer-bottom">
+      <span>Dado Aberto · 2026</span>
+      <span>Feito com matemática, não com sorte.</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
